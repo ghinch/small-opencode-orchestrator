@@ -89,6 +89,7 @@ This keeps the main agent focused on coordination instead of forcing one large p
 ├── skills/                   # Reusable skill definitions (committed)
 │   ├── agent-delegation/
 │   ├── pythonic-quality/
+│   ├── test-driven-development/
 │   ├── security-investigation/
 │   ├── skill-creator/
 │   └── task-management/
@@ -150,6 +151,7 @@ It:
 - **agent-delegation** - Decision table for routing work to the appropriate subagent
 - **task-management** - CLI for tracking feature subtasks with dependencies
 - **pythonic-quality** - Pythonic idioms, SOLID design, and Liskov-safe patterns
+- **test-driven-development** - Red-Green-Refactor workflow for feature and bugfix implementation
 - **security-investigation** - Security audit orchestration
 - **skill-creator** - Guide for creating effective skills
 

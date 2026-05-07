@@ -14,6 +14,7 @@ Must respect `permission.task` in the active primary agent's frontmatter (`agent
 - Use `general` for heavier multi-step research or exploration when `explore` is too narrow — **Task** only if `permission.task` allows it (**`build`** commonly does). The **`orchestrator`** agent does **not** list `general`; use **`code-explorer`** or **`explore`** instead.
 - Use `spec-critic` before implementation when the task is ambiguous, architectural, or spans multiple modules.
 - Use `api-docs-researcher` before coding against third-party APIs, SDKs, migrations, or recent framework behavior.
+- Load `skill: test-driven-development` before delegating any implementation work to `code-executor` or when the `build` agent begins coding — enforces test-first (red-green-refactor) for all non-trivial changes.
 - Use `test-verifier` after implementation.
 - Use `security-reviewer` when auth, secrets, file handling, shell execution, external input, network calls, permissions, or multi-tenant logic are involved.
 - Use `host-security-investigator` when you need a read-only assessment of hosting posture, exposed services, TLS, SSH access patterns, containers, or infrastructure-as-code (not for code-reviewing application logic).

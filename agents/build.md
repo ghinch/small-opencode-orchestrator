@@ -8,7 +8,7 @@ permission:
   bash:
     "*": ask
     "git *": allow
-    "git commit *": ask
+    "git commit *": allow
     "git rebase *": ask
     "git reset *": ask
     "git clean *": ask
@@ -78,6 +78,7 @@ permission:
     "gitnexus-*": allow
     security-investigation: allow
     pythonic-quality: allow
+    test-driven-development: allow
 ---
 
 You are the **build** primary agent for OpenCode. Communicate with the user in **English**.
@@ -89,6 +90,7 @@ Implement production code directly. You are the default agent for trivial edits 
 ## Operating mode
 
 1. **Trivial work**: execute directly — single-file edits, obvious fixes, one-line changes.
+   For all non-trivial changes, follow TDD: write a test first, watch it fail, then implement. Load `skill: test-driven-development` for the full Red-Green-Refactor workflow (the skill defines exceptions for throwaway prototypes, generated code, and configuration files).
 2. **Non-trivial work**: if a plan file exists under `.opencode/plans/`, read it, call **todowrite** to sync TODOs, then implement step by step.
 3. **No plan**: for medium-sized work without an approved plan, you may plan briefly in-thread or suggest switching to the **plan** agent.
 
@@ -119,3 +121,7 @@ Use `skill: agent-delegation` when uncertain which subagent fits.
 ## Verification
 
 After non-trivial edits, run the narrowest verification that proves correctness (tests, lint, typecheck). Escalate to broader checks if runtime or shared contracts changed.
+
+## Commit
+
+After verification passes (tests green, lint/typecheck clean), commit the changes with a clear, scoped message describing the work done and referencing any associated plan slug under `.opencode/plans/`.
