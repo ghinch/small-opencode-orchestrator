@@ -20,7 +20,7 @@
   "share": "manual",
   "autoupdate": true,
 
-  // Minimal workspace baseline; per-agent tool policy lives in agents/<id>.md frontmatter.
+  // Minimal workspace baseline; per-agent tool policy lives in agents/<id>.md frontmatter. If you want it more permissive you can copy to your project workspace ./opencode/opencode.jsonc with "allow" instead
   "permission": {
     "bash": {
       "*": "deny",
@@ -32,13 +32,13 @@
   "agent": {
     "build": {
       "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "xhigh",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "plan": {
       "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "xhigh",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
@@ -46,62 +46,63 @@
       // plan-post-approval plugin reads this path only (not merged from agent frontmatter).
       "plan_post_approval_handoff_agent": "orchestrator",
       "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "xhigh",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
       "temperature": 0.2,
     },
 
     "plan-runner": {
-      "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "xhigh",
+    // stick with pro here aswell if you accept the speed vs quality tradeoff
+      "model": "opencode-go/deepseek-v4-flash",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
       "temperature": 0.2,
     },
 
     // Cheap model for subagents (defined in agents/<id>.md)
     "code-explorer": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
       "temperature": 0.2,
     },
 
     "code-executor": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "test-verifier": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "spec-critic": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "security-reviewer": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "docs-reviewer": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "code-reviewer": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "api-docs-researcher": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
 
     "host-security-investigator": {
-      "reasoningEffort": "high",
+      "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
   },
