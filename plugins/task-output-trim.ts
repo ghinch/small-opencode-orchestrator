@@ -2,12 +2,8 @@ import type { Plugin, PluginInput } from "@opencode-ai/plugin";
 
 const THRESHOLD       = 6_000;   // chars; output above this triggers summarization
 const TAIL_FALLBACK   = 3_000;   // chars kept in tail-truncation fallback
-const POLL_MS         = 500;
-const TIMEOUT_MS      = 20_000;
-const SUMMARIZE_AGENT = "task-output-summarizer";
 
 const inFlight = new Set<string>();
-const sleep = (ms: number) => new Promise<void>((r) => setTimeout(r, ms));
 
 /** Last chronological `agent` field on user messages — typically the routing primary for that turn. */
 async function lastUserRoutingAgent(
@@ -51,7 +47,17 @@ async function summarizeViaSession(
   let tempID: string | null = null;
   try {
     const created = await client.session.create({ body: {}, query: { directory } });
-    if (created.error || !created.data?.id) return null;
+    if (created.error || !created.data?.id) {
+      await client.app.log({
+        query: { directory },
+        body: {
+          service: "task-output-trim",
+          level: "error",
+          message: `session.create failed: ${JSON.stringify(created.error ?? "no id returned")}`,
+        },
+      }).catch(() => {});
+      return null;
+    }
     tempID = created.data.id;
 
     await client.app.log({
@@ -63,58 +69,111 @@ async function summarizeViaSession(
       },
     });
 
-    const promptResult = await client.session.prompt({
+    const prompt = await client.session.prompt({
       path: { id: tempID },
       query: { directory },
       body: {
-        agent: SUMMARIZE_AGENT,
+        model: { providerID: "opencode-go", modelID: "deepseek-v4-pro" },
+        tools: {},
+        system:
+            "You are a concise technical summarizer. Extract and return only: outcome/status, key file paths, errors/warnings, and next steps. Omit verbose logs, listings, shell noise, and redundant reasoning. Target 300-500 words. Plain prose or tight bullet points.",
         parts: [
-          {
-            type: "text",
-            text:
-              "The following is the full output from a subagent task. Summarize it concisely.\n\n" +
-              "--- OUTPUT ---\n" +
-              text,
-          },
+            {
+                type: "text",
+                text:
+                    "The following is the full output from a subagent task. Summarize it concisely.\n\n" +
+                    "--- OUTPUT ---\n" +
+                    text,
+            },
         ],
       },
     });
-    if (promptResult.error) {
+
+    if (prompt.error) {
       await client.app.log({
         query: { directory },
         body: {
           service: "task-output-trim",
           level: "warn",
-          message: `Summarization prompt failed: ${JSON.stringify(promptResult.error)}`,
+          message: `session.prompt failed: ${JSON.stringify(prompt.error)}`,
         },
       });
       return null;
     }
 
-    const deadline = Date.now() + TIMEOUT_MS;
-    while (Date.now() < deadline) {
-      await sleep(POLL_MS);
-      const msgs = await client.session.messages({
-        path: { id: tempID },
-        query: { directory, limit: 20 },
-      });
-      if (msgs.error) return null;
-      if (!msgs.data?.length) continue;
-      for (let i = msgs.data.length - 1; i >= 0; i--) {
-        const msg = msgs.data[i]!;
+    // Extract text from assistant reply in the response
+    // session.prompt() may return an array of messages OR a single message object
+    const response = prompt.data;
+    if (!response) {
+      await client.app.log({
+        query: { directory },
+        body: {
+          service: "task-output-trim",
+          level: "warn",
+          message: "session.prompt returned null/undefined data",
+        },
+      }).catch(() => {});
+      return null;
+    }
+
+    // Helper to extract text parts from a message-like object
+    const extractText = (msg: any): string | null => {
+      const parts = msg?.parts;
+      if (!Array.isArray(parts)) return null;
+      const text = parts
+        .filter((p: any) => p.type === "text")
+        .map((p: any) => p.text ?? "")
+        .join("\n")
+        .trim();
+      return text || null;
+    };
+
+    // Case 1: response is an array of messages
+    if (Array.isArray(response)) {
+      for (let i = response.length - 1; i >= 0; i--) {
+        const msg = response[i]!;
         const info = msg.info;
-        if ("role" in info && info.role === "assistant") {
-          const parts = (msg as { parts?: Array<{ type: string; text?: string }> }).parts ?? [];
-          const text = parts
-            .filter((p) => p.type === "text")
-            .map((p) => p.text ?? "")
-            .join("\n")
-            .trim();
+        if (info && typeof info === "object" && "role" in info && info.role === "assistant") {
+          const text = extractText(msg);
           if (text) return text;
         }
       }
+    } else if (typeof response === "object" && response !== null) {
+      // Case 2: response is a single message object { info, parts }
+      const info = (response as any).info;
+      if (info && typeof info === "object" && "role" in info && info.role === "assistant") {
+        const text = extractText(response);
+        if (text) return text;
+      }
+      // Case 3: response has parts directly (no info wrapper)
+      const text = extractText(response);
+      if (text) return text;
     }
-    return null; // timed out
+
+    await client.app.log({
+      query: { directory },
+      body: {
+        service: "task-output-trim",
+        level: "warn",
+        message: "No assistant text found in session.prompt response",
+        extra: {
+          tempID,
+          dataType: typeof response,
+          isArray: Array.isArray(response),
+        },
+      },
+    }).catch(() => {});
+    return null;
+  } catch (e) {
+    await client.app.log({
+      query: { directory },
+      body: {
+        service: "task-output-trim",
+        level: "error",
+        message: `summarizeViaSession threw: ${e}`,
+      },
+    }).catch(() => {});
+    return null;
   } finally {
     if (tempID) {
       try {
@@ -157,7 +216,7 @@ const TaskOutputTrimPlugin: Plugin = async ({ client, directory }) => {
               `[task-output-trim | ${subagent} | summarized ${original.length} → ${summary.length} chars]\n\n` +
               summary;
           } else {
-            output.output = tailFallback(original, subagent, "timed out");
+            output.output = tailFallback(original, subagent, "summarization failed (check server logs)");
           }
         } catch (e) {
           output.output = tailFallback(original, subagent, `failed: ${e}`);
