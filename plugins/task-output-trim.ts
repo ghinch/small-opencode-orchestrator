@@ -1,4 +1,6 @@
 import type { Plugin, PluginInput } from "@opencode-ai/plugin";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const THRESHOLD       = 6_000;   // chars; output above this triggers summarization
 const TAIL_FALLBACK   = 3_000;   // chars kept in tail-truncation fallback
@@ -39,6 +41,32 @@ function tailFallback(original: string, subagent: string, reason: string): strin
   );
 }
 
+/** Extract the body text from a markdown file with YAML frontmatter (delimited by ---). */
+function extractMdBody(filePath: string): string {
+  const raw = readFileSync(filePath, "utf-8");
+  const firstDelim = raw.indexOf("---");
+  if (firstDelim === -1) return raw.trim();
+  const secondDelim = raw.indexOf("---", firstDelim + 3);
+  if (secondDelim === -1) return raw.trim();
+  return raw.slice(secondDelim + 3).trim();
+}
+
+let cachedSystemPrompt: string | null = null;
+
+/** Load the summarizer system prompt from disk, caching the result. */
+function loadSystemPrompt(directory: string): string {
+  if (cachedSystemPrompt) return cachedSystemPrompt;
+  try {
+    const filePath = resolve(directory, "agents", "task-output-summarizer.md");
+    cachedSystemPrompt = extractMdBody(filePath);
+    return cachedSystemPrompt;
+  } catch {
+    cachedSystemPrompt =
+      "You are a concise technical summarizer. Extract and return only: outcome/status, key file paths, errors/warnings, and next steps. Omit verbose logs, listings, shell noise, and redundant reasoning. Target 300-500 words. Plain prose or tight bullet points.";
+    return cachedSystemPrompt;
+  }
+}
+
 async function summarizeViaSession(
   client: PluginInput["client"],
   directory: string,
@@ -75,8 +103,7 @@ async function summarizeViaSession(
       body: {
         model: { providerID: "opencode-go", modelID: "deepseek-v4-pro" },
         tools: {},
-        system:
-            "You are a concise technical summarizer. Extract and return only: outcome/status, key file paths, errors/warnings, and next steps. Omit verbose logs, listings, shell noise, and redundant reasoning. Target 300-500 words. Plain prose or tight bullet points.",
+        system: loadSystemPrompt(directory),
         parts: [
             {
                 type: "text",

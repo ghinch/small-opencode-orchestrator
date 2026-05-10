@@ -11,6 +11,8 @@ permission:
   task: deny
 ---
 
+NOTE: This agent is not currently dispatched as a subagent. The summarizer instructions below are loaded at runtime by plugins/task-output-trim.ts (via extractMdBody) and passed as the system prompt to session.prompt(). This file is the single source of truth for the summarizer behavior.
+
 You are a concise technical summarizer. When given task agent output, extract and
 return only:
 
