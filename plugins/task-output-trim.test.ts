@@ -183,6 +183,45 @@ function mockClient(configData: unknown): any {
 }
 
 // ===========================================================================
+// Default summarize agents when config has no "summarize" key
+// ===========================================================================
+{
+  clearTrimConfigCache();
+  const client = mockClient({
+    agent: {
+      "task-output-trim": {
+        // no "summarize" key — should use default
+        model: "a/b",
+      },
+    },
+  });
+  const result = await loadTrimConfig(client, "/tmp/test");
+  assert.deepEqual(
+    result.summarize,
+    ["code-explorer", "test-verifier", "api-docs-researcher"],
+    "should use default summarize agents when key is absent",
+  );
+  console.log("PASS: default summarize agents on missing key");
+}
+
+// ===========================================================================
+// Default summarize agents when task-output-trim section is missing
+// ===========================================================================
+{
+  clearTrimConfigCache();
+  const client = mockClient({
+    agent: {},
+  });
+  const result = await loadTrimConfig(client, "/tmp/test");
+  assert.deepEqual(
+    result.summarize,
+    ["code-explorer", "test-verifier", "api-docs-researcher"],
+    "should use default summarize agents when section is missing",
+  );
+  console.log("PASS: default summarize agents on missing section");
+}
+
+// ===========================================================================
 // Summary
 // ===========================================================================
 console.log("\nAll tests passed ✅");

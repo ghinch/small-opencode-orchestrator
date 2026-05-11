@@ -11,6 +11,7 @@ interface TrimConfig {
 }
 
 const DEFAULT_MODEL: TrimConfig["model"] = { providerID: "opencode-go", modelID: "deepseek-v4-pro" };
+const DEFAULT_SUMMARIZE_AGENTS = ["code-explorer", "test-verifier", "api-docs-researcher"];
 
 let cachedTrimConfig: TrimConfig | null = null;
 
@@ -53,9 +54,13 @@ async function loadTrimConfig(
 
   // Parse allowlist
   let summarize: string[] | null = null;
-  if (Array.isArray(summarizeList) && summarizeList.length > 0) {
+  if (summarizeList === undefined) {
+    // No key in config → use default agents
+    summarize = DEFAULT_SUMMARIZE_AGENTS;
+  } else if (Array.isArray(summarizeList) && summarizeList.length > 0) {
     summarize = summarizeList.filter((s): s is string => typeof s === "string");
   }
+  // else: summarize remains null (explicit empty array → no filtering = all agents)
 
   cachedTrimConfig = { model, summarize };
   return cachedTrimConfig;
