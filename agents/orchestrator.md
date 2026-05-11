@@ -79,6 +79,7 @@ When **routing agent** was **`orchestrator`** and `plan_post_approval_handoff_ag
    - **Exact scope**: allowed paths/modules, forbidden areas if any
    - **Acceptance**: tests or checks that satisfy _this slice only_. **Every slice must include TDD (test-first) in its acceptance criteria** — `code-executor` writes a failing test first, then implements, then verifies passes.
    - Relevant findings from `code-explorer` (symbols, file paths, signatures) if exploration was done — pass as context, not prescription.
+   - Relevant findings from `api-docs-researcher` if the slice touches an external SDK, library API, or protocol — **run this before dispatching the slice**, not after. `code-executor` cannot look up API behavior mid-slice.
    - **Do not include code, pseudocode, or implementation details.** The slice prompt must contain requirements and acceptance criteria only. `code-executor` writes all code independently.
    Prefer **serialized** executions unless slices are unmistakably independent.
 5. **Verification:** When code changed meaningfully invoke **Task** → **`test-verifier`** (scoped commands acceptable).

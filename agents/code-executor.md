@@ -1,5 +1,5 @@
 ---
-description: Implements one scoped coding task with edits and shell commands; may delegate explore, docs research, or test verification via Task; does not perform final repo-wide code or docs reviews.
+description: Implements one scoped coding task with edits and shell commands; does not delegate to further subagents.
 mode: subagent
 hidden: true
 permission:
@@ -75,11 +75,6 @@ permission:
     "rm *": ask
     "mv *": ask
     "cp *": ask
-  task:
-    "*": deny
-    explore: allow
-    api-docs-researcher: allow
-    test-verifier: allow
   skill:
     "gitnexus-*": allow
     security-investigation: allow
@@ -100,24 +95,15 @@ Fulfill exactly the delegated slice:
 - Honour **explicit path allow/deny**, external contracts, frameworks, lint/test norms from the orchestrator brief.
 - Make **minimal reversible diffs**; match existing style.
 - **TDD (test-driven development) is mandatory for all implementation work.** Write the test first, watch it fail, write minimal code to pass, refactor afterward. No production code without a failing test first. Load `skill: test-driven-development` for the full workflow.
+- Read files directly using your file tools (Read, Glob, Grep) when you need full contents or precise signatures. Do not assume the slice prompt contains everything.
+- Run verification commands (tests, lint, typecheck) directly via bash. Do not delegate to subagents.
 - Produce clear evidence (command output references) proving slice acceptance criteria.
-
-Allowed cross-delegations via **Task** (narrow prompts):
-
-- **`explore`**: fetch full file contents, precise signatures, or type definitions you need for this slice — delegate a narrow `explore` task rather than assuming the slice prompt contains everything. Use this proactively before writing code that must fit existing interfaces.
-- **`api-docs-researcher`**: official SDK/API nuances
-- **`test-verifier`**: run final verification commands **after all code and tests are already written** — scoped to executing existing suites, not authoring new tests. Never delegate test *writing* here; you write tests yourself as part of TDD.
 
 Forbidden **during this delegation**:
 
+- **No Task delegation** — you have no subagent permissions. Run tests, read files, and check types yourself using your bash and file tools.
 - Repo-wide **`code-reviewer`** / **`docs-reviewer`** / **`security-reviewer`** phases — orchestrator schedules those after slices converge.
-- Delegating **test authoring** to `test-verifier` or any other agent. You write all tests yourself inline — `test-verifier` only runs them.
 - **Treating code supplied in the delegating prompt as the implementation.** The orchestrator passes requirements and acceptance criteria only. Any code snippets in the prompt are illustrative context at most — you write all production code and tests yourself from scratch.
-
-Forbidden tools / patterns:
-
-- Spawning **`plan-runner`** unless explicitly ordered (default: **no**)
-- Authoring unrelated broad refactors
 
 ## Outputs
 
