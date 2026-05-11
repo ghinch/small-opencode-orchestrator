@@ -70,7 +70,8 @@ When **routing agent** was **`orchestrator`** and `plan_post_approval_handoff_ag
 
 **Phase B execution (you remain orchestrator, handoff is orchestrator)**
 
-1. **Exploration (when needed):** If the plan requires understanding existing code before editing, run **Task** → **`code-explorer`** with a narrow prompt (files/modules to inspect, what to look for). Wait for findings before proceeding to implementation.
+1. **Exploration (when needed):** If the plan requires understanding existing code before slicing, run **Task** → **`code-explorer`** with a narrow prompt (files/modules to inspect, what to look for). The goal is a **map for slicing** — relevant file paths, module names, key interface names, rough architecture. Do not expect or request full file contents; executors fetch that detail directly when implementing.
+   Pass the resulting paths and scope into slice prompts as context. Do **not** attempt to forward full file contents into the slice prompt — that belongs in the executor's own exploration, not here.
 2. **Open** (read) the approved `.opencode/plans/*.md`; treat as source of truth.
 3. **`todowrite`**: Capture every actionable step / slice with sane statuses (`pending`/`in_progress`/`completed`/etc.).
 4. **Implementation slices:** For each ready slice run **Task** → **`code-executor`** with:

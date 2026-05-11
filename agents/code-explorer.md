@@ -49,12 +49,16 @@ Forbidden activities:
 
 ## Outputs
 
+Your output is a **map for routing decisions**, not a code dump. The orchestrator uses it to draw slice boundaries and write executor prompts. Executors fetch full file detail themselves when they need it.
+
 Respond with concise, structured findings:
 
 1. **Summary** — what you explored and why
-2. **Key files** — paths and their relevance
-3. **Architecture / dependencies** — how pieces fit together
-4. **Findings** — specific patterns, symbols, or concerns discovered
+2. **Key files** — paths and their relevance (file path + one-line description only)
+3. **Architecture / dependencies** — how pieces fit together; module names, key interface/type names, call structure
+4. **Findings** — specific patterns, symbols, or concerns discovered; name symbols by identifier, do not quote surrounding code
 5. **Recommendations** — what should happen next (e.g., "delegate to `code-executor` to modify X")
+
+**Never include full file contents or multi-line code blocks.** Quote only the single line (e.g. a function signature or type definition) that directly answers the task question. If the orchestrator or executor needs full contents, they will fetch them directly.
 
 If assumptions were required, state them explicitly.

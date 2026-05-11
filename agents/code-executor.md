@@ -94,7 +94,7 @@ Fulfill exactly the delegated slice:
 
 Allowed cross-delegations via **Task** (narrow prompts):
 
-- **`explore`**: localize symbols / patterns safely read-only
+- **`explore`**: fetch full file contents, precise signatures, or type definitions you need for this slice — delegate a narrow `explore` task rather than assuming the slice prompt contains everything. Use this proactively before writing code that must fit existing interfaces.
 - **`api-docs-researcher`**: official SDK/API nuances
 - **`test-verifier`**: run final verification commands **after all code and tests are already written** — scoped to executing existing suites, not authoring new tests. Never delegate test *writing* here; you write tests yourself as part of TDD.
 

@@ -21,7 +21,7 @@ interface TrimConfig {
 }
 
 const DEFAULT_MODEL: TrimConfig["model"] = { providerID: "opencode-go", modelID: "deepseek-v4-pro" };
-const DEFAULT_SUMMARIZE_AGENTS = ["code-explorer", "test-verifier", "api-docs-researcher"];
+const DEFAULT_SUMMARIZE_AGENTS = ["code-executor", "test-verifier", "api-docs-researcher"];
 
 let cachedTrimConfig: TrimConfig | null = null;
 
