@@ -105,5 +105,11 @@
       "reasoningEffort": "max",
       "textVerbosity": "medium",
     },
+
+    // Plugin config for task-output-trim (optional)
+    // "task-output-trim": {
+    //   "model": "opencode-go/deepseek-v4-flash",
+    //   "summarize": ["code-explorer", "test-verifier"]
+    // },
   },
 }

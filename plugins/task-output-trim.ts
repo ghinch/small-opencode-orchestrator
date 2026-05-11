@@ -5,6 +5,62 @@ import { resolve } from "node:path";
 const THRESHOLD       = 6_000;   // chars; output above this triggers summarization
 const TAIL_FALLBACK   = 3_000;   // chars kept in tail-truncation fallback
 
+interface TrimConfig {
+  model: { providerID: string; modelID: string };
+  summarize: string[] | null;   // null = all agents are summarized
+}
+
+const DEFAULT_MODEL: TrimConfig["model"] = { providerID: "opencode-go", modelID: "deepseek-v4-pro" };
+
+let cachedTrimConfig: TrimConfig | null = null;
+
+async function loadTrimConfig(
+  client: PluginInput["client"],
+  directory: string,
+): Promise<TrimConfig> {
+  if (cachedTrimConfig) return cachedTrimConfig;
+
+  const config = await client.config.get({ query: { directory } });
+  if (config.error || !config.data) {
+    cachedTrimConfig = { model: DEFAULT_MODEL, summarize: null };
+    return cachedTrimConfig;
+  }
+
+  const raw = config.data.agent?.["task-output-trim"];
+  const modelSpec: string | undefined = raw?.model;
+  const summarizeList: unknown = raw?.summarize;
+
+  // Parse model
+  let model = DEFAULT_MODEL;
+  if (typeof modelSpec === "string") {
+    const idx = modelSpec.indexOf("/");
+    if (idx !== -1) {
+      model = {
+        providerID: modelSpec.slice(0, idx),
+        modelID: modelSpec.slice(idx + 1),
+      };
+    } else {
+      client.app.log({
+        query: { directory },
+        body: {
+          service: "task-output-trim",
+          level: "warn",
+          message: `Invalid model spec "${modelSpec}" — missing "/". Using default.`,
+        },
+      }).catch(() => {});
+    }
+  }
+
+  // Parse allowlist
+  let summarize: string[] | null = null;
+  if (Array.isArray(summarizeList) && summarizeList.length > 0) {
+    summarize = summarizeList.filter((s): s is string => typeof s === "string");
+  }
+
+  cachedTrimConfig = { model, summarize };
+  return cachedTrimConfig;
+}
+
 const inFlight = new Set<string>();
 
 /** Last chronological `agent` field on user messages — typically the routing primary for that turn. */
@@ -62,7 +118,7 @@ function loadSystemPrompt(directory: string): string {
     return cachedSystemPrompt;
   } catch {
     cachedSystemPrompt =
-      "You are a concise technical summarizer. Extract and return only: outcome/status, key file paths, errors/warnings, and next steps. Omit verbose logs, listings, shell noise, and redundant reasoning. Target 300-500 words. Plain prose or tight bullet points.";
+      "You are a subagent-output summarizer for an OpenCode orchestrator. The orchestrator uses your summaries to decide next steps without reading verbose task output.\n\nExtract and return only what the orchestrator needs:\n\n**Status** — succeeded / failed / partial (one line)\n**Key findings** — What was discovered, changed, or verified. Include exact file paths.\n**Errors (verbatim)** — Copy exact error messages, stack traces, and exit codes. Do not paraphrase.\n**Decisions made** — Choices the subagent made that affect downstream work (e.g., library chosen, approach taken, workarounds applied).\n**Next actions** — What the orchestrator should do based on this output.\n\nRules: Omit verbose logs, shell noise, unchanged listings, and redundant reasoning. Target 200–400 words; go shorter when possible. Never invent findings. If the output is short enough to read as-is, say \"[output retained in full]\" instead.";
     return cachedSystemPrompt;
   }
 }
@@ -71,6 +127,7 @@ async function summarizeViaSession(
   client: PluginInput["client"],
   directory: string,
   text: string,
+  config: TrimConfig,
 ): Promise<string | null> {
   let tempID: string | null = null;
   try {
@@ -101,7 +158,7 @@ async function summarizeViaSession(
       path: { id: tempID },
       query: { directory },
       body: {
-        model: { providerID: "opencode-go", modelID: "deepseek-v4-pro" },
+        model: config.model,
         tools: {},
         system: loadSystemPrompt(directory),
         parts: [
@@ -234,10 +291,16 @@ const TaskOutputTrimPlugin: Plugin = async ({ client, directory }) => {
         if (routingAgent !== "orchestrator") return;
 
         const subagent: string = (input.args as any)?.subagent_type ?? "unknown-agent";
+
+        const trimConfig = await loadTrimConfig(client, directory);
+        if (trimConfig.summarize !== null && !trimConfig.summarize.includes(subagent)) {
+          return; // not in allowlist — leave output unchanged
+        }
+
         const original = output.output;
 
         try {
-          const summary = await summarizeViaSession(client, directory, original);
+          const summary = await summarizeViaSession(client, directory, original, trimConfig);
           if (summary) {
             output.output =
               `[task-output-trim | ${subagent} | summarized ${original.length} → ${summary.length} chars]\n\n` +
@@ -254,5 +317,12 @@ const TaskOutputTrimPlugin: Plugin = async ({ client, directory }) => {
     },
   };
 };
+
+// Exported for testing
+export type { TrimConfig };
+export { loadTrimConfig };
+export function clearTrimConfigCache(): void {
+  cachedTrimConfig = null;
+}
 
 export default TaskOutputTrimPlugin;
