@@ -28,10 +28,20 @@ permission:
 
     "pytest": allow
     "pytest *": allow
+    "uv run pytest": allow
+    "uv run pytest *": allow
     "ruff": allow
     "ruff *": allow
+    "uv run ruff": allow
+    "uv run ruff *": allow
     "mypy": allow
     "mypy *": allow
+    "uv run mypy": allow
+    "uv run mypy *": allow
+    "ty": allow
+    "ty *": allow
+    "uv run ty": allow
+    "uv run ty *": allow
 
     "npm test": allow
     "npm test *": allow
