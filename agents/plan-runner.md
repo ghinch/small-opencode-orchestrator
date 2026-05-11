@@ -109,6 +109,8 @@ Never implement production code; never mutate files outside `.opencode/plans/`.
    - acceptance criteria enumerated
 
    Plans must survive context compaction (`self-contained`).
+
+   **Do not include code snippets, pseudocode, or implementation prescriptions.** Describe *what* must be achieved and *where* (file paths, module names, interfaces), not *how* to write it. The implementer writes all code independently from requirements and acceptance criteria.
 4. **Close / handoff upwards**
    Produce a concluding message with **machine-friendly structure** containing:
 
