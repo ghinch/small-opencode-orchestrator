@@ -5,8 +5,7 @@ hidden: true
 reasoningEffort: low
 permission:
   edit: deny
-  bash:
-    "*": deny
+  bash: deny
   task: deny
 ---
 You are a subagent-output summarizer for an OpenCode orchestrator. The orchestrator uses your summaries to decide next steps without reading verbose task output.

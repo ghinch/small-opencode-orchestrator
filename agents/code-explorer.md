@@ -8,16 +8,13 @@ permission:
   doom_loop: deny
   edit: deny
   bash:
-    "*": deny
     "pwd": allow
     "ls *": allow
     "find *": allow
     "cat *": allow
     "head *": allow
     "tail *": allow
-    "grep *": allow
     "rg *": allow
-    "git *": allow
   task:
     explore: allow
     api-docs-researcher: allow

@@ -17,56 +17,7 @@ permission:
     "tail *": allow
     "sed *": allow
     "awk *": allow
-    "grep *": allow
     "rg *": allow
-    "pytest": allow
-    "pytest *": allow
-    "uv run pytest": allow
-    "uv run pytest *": allow
-    "ruff": allow
-    "ruff *": allow
-    "uv run ruff": allow
-    "uv run ruff *": allow
-    "mypy": allow
-    "mypy *": allow
-    "uv run mypy": allow
-    "uv run mypy *": allow
-    "ty": allow
-    "ty *": allow
-    "uv run ty": allow
-    "uv run ty *": allow
-    "npm test": allow
-    "npm test *": allow
-    "npm run test": allow
-    "npm run test *": allow
-    "npm run lint": allow
-    "npm run lint *": allow
-    "npm run build": allow
-    "npm run build *": allow
-    "pnpm test": allow
-    "pnpm test *": allow
-    "pnpm lint": allow
-    "pnpm lint *": allow
-    "pnpm build": allow
-    "pnpm build *": allow
-    "yarn test": allow
-    "yarn test *": allow
-    "yarn lint": allow
-    "yarn lint *": allow
-    "yarn build": allow
-    "yarn build *": allow
-    "bun test": allow
-    "bun test *": allow
-    "bun run lint": allow
-    "bun run lint *": allow
-    "bun run build": allow
-    "bun run build *": allow
-    "cargo test": allow
-    "cargo test *": allow
-    "cargo check": allow
-    "cargo check *": allow
-    "go test": allow
-    "go test *": allow
     "rm *": ask
     "mv *": ask
     "cp *": ask
@@ -79,10 +30,8 @@ permission:
     code-reviewer: allow
     security-reviewer: allow
     docs-reviewer: allow
-    host-security-investigator: allow
   skill:
     "gitnexus-*": allow
-    security-investigation: allow
     pythonic-quality: allow
     test-driven-development: allow
 ---
@@ -110,7 +59,6 @@ You may delegate via **Task** to subagents when appropriate:
 - `code-reviewer` — review a stable diff (prefer after implementation)
 - `security-reviewer` — when auth/secrets/shell/network touchpoints change
 - `docs-reviewer` — when CLI/config/env/public API changes
-- `host-security-investigator` — read-only hosting posture (rare for build)
 - `spec-critic` — challenge ambiguous requirements before coding
 
 Use `skill: agent-delegation` when uncertain which subagent fits.

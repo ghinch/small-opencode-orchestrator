@@ -20,10 +20,8 @@ permission:
     code-reviewer: allow
     docs-reviewer: allow
     security-reviewer: allow
-    host-security-investigator: allow
   skill:
     "gitnexus-*": allow
-    security-investigation: allow
     pythonic-quality: allow
     test-driven-development: allow
     brainstorming: allow

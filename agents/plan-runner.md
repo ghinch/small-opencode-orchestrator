@@ -13,12 +13,6 @@ permission:
   doom_loop: deny
   bash:
     "*": deny
-    "git *": allow
-    "git commit *": deny
-    "git rebase *": deny
-    "git reset *": deny
-    "git clean *": deny
-    "git push *": deny
     "pwd": allow
     "ls *": allow
     "find *": allow
@@ -27,46 +21,7 @@ permission:
     "tail *": allow
     "sed *": allow
     "awk *": allow
-    "grep *": allow
     "rg *": allow
-    "pytest": allow
-    "pytest *": allow
-    "ruff": allow
-    "ruff *": allow
-    "mypy": allow
-    "mypy *": allow
-    "npm test": allow
-    "npm test *": allow
-    "npm run test": allow
-    "npm run test *": allow
-    "npm run lint": allow
-    "npm run lint *": allow
-    "npm run build": allow
-    "npm run build *": allow
-    "pnpm test": allow
-    "pnpm test *": allow
-    "pnpm lint": allow
-    "pnpm lint *": allow
-    "pnpm build": allow
-    "pnpm build *": allow
-    "yarn test": allow
-    "yarn test *": allow
-    "yarn lint": allow
-    "yarn lint *": allow
-    "yarn build": allow
-    "yarn build *": allow
-    "bun test": allow
-    "bun test *": allow
-    "bun run lint": allow
-    "bun run lint *": allow
-    "bun run build": allow
-    "bun run build *": allow
-    "cargo test": allow
-    "cargo test *": allow
-    "cargo check": allow
-    "cargo check *": allow
-    "go test": allow
-    "go test *": allow
     "rm *": deny
     "mv *": deny
     "cp *": deny
@@ -74,10 +29,8 @@ permission:
     explore: allow
     spec-critic: allow
     api-docs-researcher: allow
-    host-security-investigator: allow
   skill:
     "gitnexus-*": allow
-    security-investigation: allow
     pythonic-quality: allow
 ---
 
@@ -96,7 +49,6 @@ Never implement production code; never mutate files outside `.opencode/plans/`.
    - Prefer **Task** → **`explore`** for repo discovery
    - **Task** → **`spec-critic`** when cross-cutting ambiguity exists
    - **Task** → **`api-docs-researcher`** when external SDK/API/version nuances matter
-   - Optionally **Task** → **`host-security-investigator`** strictly for infra posture cues found in-repo.
 3. **Write** the Markdown plan:
 
    Path pattern: `.opencode/plans/<short-slug>.md` (`kebab-case` slug)

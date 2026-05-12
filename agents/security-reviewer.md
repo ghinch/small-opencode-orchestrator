@@ -8,14 +8,11 @@ permission:
   doom_loop: deny
   edit: deny
   bash:
-    "*": deny
     "pwd": allow
     "ls *": allow
     "find *": allow
     "cat *": allow
-    "grep *": allow
     "rg *": allow
-    "git *": allow
   webfetch: deny
   websearch: deny
 ---

@@ -84,8 +84,7 @@ This keeps the main agent focused on coordination instead of forcing one large p
 │   ├── test-verifier.md
 │   ├── code-reviewer.md
 │   ├── docs-reviewer.md
-│   ├── security-reviewer.md
-│   └── host-security-investigator.md
+│   └── security-reviewer.md
 ├── skills/                   # Reusable skill definitions (committed)
 │   ├── agent-delegation/
 │   ├── pythonic-quality/
@@ -117,7 +116,6 @@ This keeps the main agent focused on coordination instead of forcing one large p
 - **security-reviewer** - Identifies security risks in application code
 - **spec-critic** - Challenges plans before coding starts
 - **api-docs-researcher** - Researches external API documentation
-- **host-security-investigator** - Assesses hosting and infrastructure security concerns
 
 ## When to use this
 

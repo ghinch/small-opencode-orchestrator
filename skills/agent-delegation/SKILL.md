@@ -5,7 +5,7 @@ description: "Use when the primary agent must decide whether to delegate via the
 
 # Subagent delegation (OpenCode)
 
-Must respect `permission.task` in the active primary agent's frontmatter (`agents/<id>.md` — `build` vs `plan` vs `orchestrator` have different allowlists). The `plan` agent cannot invoke `test-verifier`, `code-reviewer`, `security-reviewer`, or `docs-reviewer` via Task. The `plan` agent **may** invoke `host-security-investigator` when it appears in `permission.task` (read-only hosting and service investigation). The **`orchestrator`** agent drives Task `plan-runner`, `code-executor`, and the usual reviewers per its prompt; it does not implement code directly.
+Must respect `permission.task` in the active primary agent's frontmatter (`agents/<id>.md` — `build` vs `plan` vs `orchestrator` have different allowlists). The `plan` agent cannot invoke `test-verifier`, `code-reviewer`, `security-reviewer`, or `docs-reviewer` via Task. The **`orchestrator`** agent drives Task `plan-runner`, `code-executor`, and the usual reviewers per its prompt; it does not implement code directly.
 
 - Always spawn the subagents respecting the models defined for each one.
 - Use `code-explorer` for reading and exploring codebase files, architecture mapping, and symbol location. This is the dedicated read-only exploration agent.
@@ -17,7 +17,6 @@ Must respect `permission.task` in the active primary agent's frontmatter (`agent
 - Load `skill: test-driven-development` before delegating any implementation work to `code-executor` or when the `build` agent begins coding — enforces test-first (red-green-refactor) for all non-trivial changes.
 - Use `test-verifier` after implementation.
 - Use `security-reviewer` when auth, secrets, file handling, shell execution, external input, network calls, permissions, or multi-tenant logic are involved.
-- Use `host-security-investigator` when you need a read-only assessment of hosting posture, exposed services, TLS, SSH access patterns, containers, or infrastructure-as-code (not for code-reviewing application logic).
 - Use `code-reviewer` before finalizing any meaningful diff. This agent reviews only — it does not write or explore.
 - Use `docs-reviewer` when user-facing behavior, config, env vars, CLI, API shape, or setup steps changed.
 

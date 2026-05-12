@@ -7,13 +7,6 @@ permission:
   external_directory: deny
   doom_loop: deny
   bash:
-    "*": deny
-    "git *": allow
-    "git commit *": allow
-    "git rebase *": deny
-    "git reset *": allow
-    "git clean *": allow
-    "git push *": deny
     "pwd": allow
     "ls *": allow
     "find *": allow
@@ -22,56 +15,7 @@ permission:
     "tail *": allow
     "sed *": allow
     "awk *": allow
-    "grep *": allow
     "rg *": allow
-    "pytest": allow
-    "pytest *": allow
-    "uv run pytest": allow
-    "uv run pytest *": allow
-    "ruff": allow
-    "ruff *": allow
-    "uv run ruff": allow
-    "uv run ruff *": allow
-    "mypy": allow
-    "mypy *": allow
-    "uv run mypy": allow
-    "uv run mypy *": allow
-    "ty": allow
-    "ty *": allow
-    "uv run ty": allow
-    "uv run ty *": allow
-    "npm test": allow
-    "npm test *": allow
-    "npm run test": allow
-    "npm run test *": allow
-    "npm run lint": allow
-    "npm run lint *": allow
-    "npm run build": allow
-    "npm run build *": allow
-    "pnpm test": allow
-    "pnpm test *": allow
-    "pnpm lint": allow
-    "pnpm lint *": allow
-    "pnpm build": allow
-    "pnpm build *": allow
-    "yarn test": allow
-    "yarn test *": allow
-    "yarn lint": allow
-    "yarn lint *": allow
-    "yarn build": allow
-    "yarn build *": allow
-    "bun test": allow
-    "bun test *": allow
-    "bun run lint": allow
-    "bun run lint *": allow
-    "bun run build": allow
-    "bun run build *": allow
-    "cargo test": allow
-    "cargo test *": allow
-    "cargo check": allow
-    "cargo check *": allow
-    "go test": allow
-    "go test *": allow
     "rm *": allow
     "mv *": allow
     "cp *": allow
@@ -80,7 +24,6 @@ permission:
     test-verifier: allow
   skill:
     "gitnexus-*": allow
-    security-investigation: allow
     pythonic-quality: allow
     test-driven-development: allow
 ---

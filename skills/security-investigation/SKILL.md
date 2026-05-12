@@ -44,32 +44,6 @@ Before delegating to subagents, check the local workspace for infrastructure-as-
 
 ### Step 3: Delegate to Subagents
 
-#### Target: Remote server — use `host-security-investigator`
-
-Provide a tight prompt via the **Task** tool:
-
-```
-Investigate the security posture of <host>.
-SSH: ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new -i <key> -p <port> <user>@<host>
-Scope: <scope>
-Depth: <depth>
-
-Focus on:
-1. Network exposure (listening ports, unnecessary services)
-2. SSH hardening (root login, password auth, key types)
-3. Firewall (iptables/nftables/ufw rules, default policies)
-4. User accounts (sudo users, empty passwords, UID 0 accounts)
-5. File permissions (world-writable sensitive dirs, SUID binaries)
-6. Service versions and known CVEs
-7. TLS configuration (certs, protocols, cipher suites)
-8. Container security (if Docker/Podman present)
-9. Logging and audit (journald, rsyslog, log rotation)
-10. Kernel and OS patch level
-
-For VPS checklist details, read references/vps-checklist.md in this skill.
-Cite every command you ran. Classify findings: CRITICAL / HIGH / MEDIUM / LOW / INFO.
-```
-
 #### Target: Application code — use `security-reviewer`
 
 If the workspace contains application code:
@@ -146,7 +120,6 @@ After the user addresses findings, offer to re-run targeted checks to verify rem
 
 ## Subagent Orchestration Rules
 
-- **Always** delegate to `host-security-investigator` for remote infrastructure checks
 - **Always** delegate to `security-reviewer` for application code review
 - **Optionally** delegate to `api-docs-researcher` for CVE/advisory research
 - **Never** run destructive commands on the target — subagents are configured read-only

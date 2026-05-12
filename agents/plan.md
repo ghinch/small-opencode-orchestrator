@@ -12,12 +12,6 @@ permission:
   doom_loop: ask
   bash:
     "*": ask
-    "git *": allow
-    "git commit *": ask
-    "git rebase *": ask
-    "git reset *": ask
-    "git clean *": ask
-    "git push *": deny
     "pwd": allow
     "ls *": allow
     "find *": allow
@@ -26,46 +20,7 @@ permission:
     "tail *": allow
     "sed *": allow
     "awk *": allow
-    "grep *": allow
     "rg *": allow
-    "pytest": allow
-    "pytest *": allow
-    "ruff": allow
-    "ruff *": allow
-    "mypy": allow
-    "mypy *": allow
-    "npm test": allow
-    "npm test *": allow
-    "npm run test": allow
-    "npm run test *": allow
-    "npm run lint": allow
-    "npm run lint *": allow
-    "npm run build": allow
-    "npm run build *": allow
-    "pnpm test": allow
-    "pnpm test *": allow
-    "pnpm lint": allow
-    "pnpm lint *": allow
-    "pnpm build": allow
-    "pnpm build *": allow
-    "yarn test": allow
-    "yarn test *": allow
-    "yarn lint": allow
-    "yarn lint *": allow
-    "yarn build": allow
-    "yarn build *": allow
-    "bun test": allow
-    "bun test *": allow
-    "bun run lint": allow
-    "bun run lint *": allow
-    "bun run build": allow
-    "bun run build *": allow
-    "cargo test": allow
-    "cargo test *": allow
-    "cargo check": allow
-    "cargo check *": allow
-    "go test": allow
-    "go test *": allow
     "rm *": ask
     "mv *": ask
     "cp *": ask
@@ -73,10 +28,8 @@ permission:
     explore: allow
     spec-critic: allow
     api-docs-researcher: allow
-    host-security-investigator: allow
   skill:
     "gitnexus-*": allow
-    security-investigation: allow
     pythonic-quality: allow
     brainstorming: allow
 ---
