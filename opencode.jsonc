@@ -1,122 +1,166 @@
 {
   "$schema": "https://opencode.ai/config.json",
-  "plugin": ["@mohak34/opencode-notifier@latest"],
-  // Local plugins in ~/.config/opencode/plugins/ load automatically (e.g. plan-post-approval.ts).
-
-  "provider": {
-    "opencode": {},
-    "deepseek": {
-      "models": {
-        "deepseek-v4-pro": {
-          "interleaved": {
-            "field": "reasoning_content",
-          },
-        },
-      },
-    },
-  },
-
-  "default_agent": "orchestrator",
-  "share": "manual",
   "autoupdate": true,
+  "plugin": [
+      "cc-safety-net",
+      "envsitter-guard@latest",
+      "@mohak34/opencode-notifier@latest"
+  ],
 
-  // Minimal workspace baseline; per-agent tool policy lives in agents/<id>.md frontmatter. If you want it more permissive you can copy to your project workspace ./opencode/opencode.jsonc with "allow" instead
-  "permission": {
-    "bash": {
-      "*": "deny",
-    },
-    "edit": "deny",
-  },
-
-  // Strong models for the primary agents
+  // ── Top tier (DeepSeek V4 Pro) ────────────────────────────────────
   "agent": {
     "build": {
       "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
+      "variant": "max",
+      "textVerbosity": "medium"
     },
-
     "plan": {
       "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
+      "variant": "max",
+      "textVerbosity": "medium"
     },
-
     "orchestrator": {
-      // plan-post-approval plugin reads this path only (not merged from agent frontmatter).
       "plan_post_approval_handoff_agent": "orchestrator",
-      "model": "opencode-go/deepseek-v4-pro",
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-      "temperature": 0.2,
-    },
-
-    "plan-runner": {
-    // stick with pro here aswell if you accept the speed vs quality tradeoff
       "model": "opencode-go/deepseek-v4-flash",
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-      "temperature": 0.2,
+      "variant": "medium",
+      "textVerbosity": "low",
+      "temperature": 0.2
     },
 
-    // Cheap model for subagents (defined in agents/<id>.md)
-    "code-explorer": {
-      "reasoningEffort": "max",
+    // ── Warden (strategic decision maker) ─────────────────────────
+    "warden": {
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "max",
       "textVerbosity": "medium",
-      "temperature": 0.2,
+      "temperature": 0.2
     },
-
-    "code-executor": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
-    "test-verifier": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
-    "spec-critic": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
     "security-reviewer": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "max",
+      "textVerbosity": "medium"
     },
-
-    "docs-reviewer": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
-    "code-reviewer": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
-    "api-docs-researcher": {
-      "reasoningEffort": "max",
-      "textVerbosity": "medium",
-    },
-
     "debugger": {
-      "reasoningEffort": "max",
+      "model": "opencode-go/deepseek-v4-pro",
+      "variant": "max",
       "textVerbosity": "medium",
-      "temperature": 0.2,
+      "temperature": 0.2
     },
 
+    // ── Flash tier (DeepSeek V4 Flash — all other agents) ─────────
+    "code-executor": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "variant": "max",
+      "textVerbosity": "medium"
+    },
     "refactorer": {
-      "reasoningEffort": "max",
+      "model": "opencode-go/deepseek-v4-flash",
+      "variant": "max",
       "textVerbosity": "medium",
-      "temperature": 0.1,
+      "temperature": 0.1
     },
-
-    // Plugin config for task-output-trim (optional)
-    // "task-output-trim": {
-    //   "model": "opencode-go/deepseek-v4-flash",
-    //   "summarize": ["code-executor", "test-verifier"]
-    // },
+    "code-reviewer": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "variant": "max",
+      "textVerbosity": "medium"
+    },
+    "spec-critic": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "variant": "max",
+      "textVerbosity": "medium"
+    },
+    "plan-runner": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "variant": "max",
+      "textVerbosity": "medium"
+    },
+    "api-docs-researcher": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "textVerbosity": "medium"
+    },
+    "code-explorer": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "textVerbosity": "medium",
+      "temperature": 0.2
+    },
+    "test-verifier": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "textVerbosity": "medium"
+    },
+    "docs-reviewer": {
+      "model": "opencode-go/deepseek-v4-flash",
+      "textVerbosity": "medium"
+    },
+    "task-output-summarizer": {
+      "model": "opencode-go/deepseek-v4-flash"
+    }
   },
+  "permission": {
+    "bash": {
+      "*": "deny",
+
+      // ── Force use of built-in tools over bash equivalents ────────
+      // Prefer: Read over cat/head/tail, Glob over find/ls, Edit over sed/awk
+      "grep *": "deny",
+      "cat *": "deny",
+      "head *": "deny",
+      "tail *": "deny",
+      "find *": "deny",
+      "ls *": "deny",
+      "echo *": "deny",
+
+      // ── Safe read-only git (never mutates) ──────────────────────
+      "git status *": "allow",
+      "git diff *": "allow",
+      "git log *": "allow",
+      "git show *": "allow",
+      "git stash list": "allow",
+      "git branch": "allow",
+      "git remote": "allow",
+      "git ls-files *": "allow",
+      "git rev-parse *": "allow",
+      "git blame *": "allow",
+      "git merge-base *": "allow",
+
+      // ── Same read-only commands via git -C (used by tooling) ────
+      "git -C * status *": "allow",
+      "git -C * diff *": "allow",
+      "git -C * log *": "allow",
+      "git -C * show *": "allow",
+      "git -C * stash list": "allow",
+      "git -C * branch": "allow",
+      "git -C * remote": "allow",
+      "git -C * ls-files *": "allow",
+      "git -C * rev-parse *": "allow",
+      "git -C * blame *": "allow",
+      "git -C * merge-base *": "allow",
+
+      // ── Safe local write git (mutates local only, recoverable) ──
+      "git add *": "allow",
+      "git commit *": "allow",
+      "git stash *": "allow",
+
+      // ── Same write commands via git -C ──────────────────────────
+      "git -C * add *": "allow",
+      "git -C * commit *": "allow",
+      "git -C * stash *": "allow",
+
+      // ── Potentially destructive — always ask ────────────────────
+      "git checkout *": "ask",
+      "git branch *": "ask",
+      "git reset *": "ask",
+      "git clean *": "ask",
+      "git rebase *": "ask",
+      "git push *": "ask",
+      "git -C * checkout *": "ask",
+      "git -C * branch *": "ask",
+      "git -C * reset *": "ask",
+      "git -C * clean *": "ask",
+      "git -C * rebase *": "ask",
+      "git -C * push *": "ask",
+
+      // ── Catch-all for any other git command ─────────────────────
+      "git *": "ask"
+    }
+  }
 }
+

@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@opencode-ai/plugin": "1.4.7",
+    "@opencode-ai/plugin": "1.14.30",
     "eslint": "^10.3.0"
   },
   "devDependencies": {
