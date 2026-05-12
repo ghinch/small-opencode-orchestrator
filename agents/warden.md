@@ -44,28 +44,6 @@ The orchestrator will send you a prompt with these sections:
 ## Instructions
 Decide the single next action. What agent should the orchestrator dispatch, with what parameters?
 ```
-## Approved Plan
-[Full text of the plan file from .opencode/plans/]
-
-## Current State
-[Summary of: which TODOs are done, which are in progress, which are pending, any issues or blockers]
-
-## Available Agents
-
-- `code-explorer` — read-only codebase exploration — finds files, maps architecture, locates symbols
-- `code-executor` — writes code, runs tests, makes edits. Receives scope + acceptance criteria. Must use TDD.
-- `test-verifier` — runs verification commands (tests, lint, typecheck)
-- `api-docs-researcher` — researches external SDK/API behavior
-- `security-reviewer` — reviews diffs for security risks
-- `code-reviewer` — reviews cumulative diffs for correctness
-- `docs-reviewer` — checks if docs need updates
-- `spec-critic` — critiques plans, code, or architecture
-- `debugger` — Four-Phase root-cause analysis of a failure. Read-only. Never implements fixes. Use when a `code-executor` or `test-verifier` slice has failed twice without a clear root cause.
-- `refactorer` — removes dead code, reduces complexity, consolidates duplicates. Behavior-preservation guaranteed. Use for dedicated refactoring slices in the plan — do NOT use `code-executor` for pure refactoring work.
-
-## Instructions
-Decide the single next action. What agent should the orchestrator dispatch, with what parameters?
-```
 
 ## Output format
 
