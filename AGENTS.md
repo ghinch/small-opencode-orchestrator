@@ -41,7 +41,9 @@ Subagent ids below match markdown definitions in `~/.config/opencode/agents/<id>
 
 When the default agent is **`orchestrator`**, the usual pipeline is **`plan-runner`** (Task) for plan files under `.opencode/plans/`, **`question` / PlanApprove** in this session by the orchestrator, then per-task: **`code-executor`** → **`test-verifier`** → **`code-reviewer`** (and optionally **`security-reviewer`**) → **warden review gate** → **commit** → next task. **`docs-reviewer`** runs after all tasks. The standalone **`plan`** and **`build`** agents are unchanged — use **`build`** for direct coding or Tab to **`plan`** for the classic Plan workflow without Tasks.
 
-**Inline (no Task):** trivial one-file edits, single obvious tool calls, or when the user explicitly wants everything in one thread.
+For **`orchestrator`**, delegation is a permission boundary, not just a workflow preference. It must not use native `read`, `glob`, `grep`, `list`, `lsp`, `webfetch`, `websearch`, or `bash` tools for repo discovery. If it lacks repo context, it delegates to `code-explorer`; if delegation is unnecessary overhead for a trivial direct edit, switch to `build` rather than inspecting locally.
+
+**Inline (no Task):** trivial one-file edits, single obvious tool calls, or when the user explicitly wants everything in one thread. This exception does not let `orchestrator` inspect or edit repo files directly; use `build` for direct coding.
 
 ## Git safety
 
