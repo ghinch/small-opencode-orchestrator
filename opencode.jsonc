@@ -4,7 +4,8 @@
   "plugin": [
       "cc-safety-net",
       "envsitter-guard@latest",
-      "@mohak34/opencode-notifier@latest"
+      "@mohak34/opencode-notifier@latest",
+      "opencode-history-search"
   ],
 
   // ── Top tier (DeepSeek V4 Pro) ────────────────────────────────────
@@ -91,54 +92,130 @@
       "textVerbosity": "medium"
     },
     "task-output-summarizer": {
-      "model": "opencode-go/deepseek-v4-flash"
+      "model": "github-copilot/gemini-3-flash-preview"
+    }
+  },
+  "autoupdate": true,
+  "mcp": {
+    "engram": {
+      "command": [
+        "/opt/homebrew/bin/engram",
+        "mcp",
+        "--tools=agent"
+      ],
+      "enabled": true,
+      "type": "local"
     }
   },
   "permission": {
     "bash": {
       "*": "deny",
-
-      // ── Force use of built-in tools over bash equivalents ────────
-      // Prefer: Read over cat/head/tail, Glob over find/ls, Edit over sed/awk
       "grep *": "deny",
+      "git grep *": "deny",
+      "git -C * grep *": "deny",
       "cat *": "deny",
       "head *": "deny",
       "tail *": "deny",
       "find *": "deny",
       "ls *": "deny",
       "echo *": "deny",
-
-      // ── Safe read-only git (never mutates) ──────────────────────
+      // --- read-only git (status / diff / log / show) ---
+      "git status": "allow",
       "git status *": "allow",
+      "git diff": "allow",
       "git diff *": "allow",
+      "git diff-tree *": "allow",
+      "git diff-index *": "allow",
+      "git log": "allow",
       "git log *": "allow",
+      "git shortlog": "allow",
+      "git shortlog *": "allow",
+      "git show": "allow",
       "git show *": "allow",
+      // --- refs / stash / branch / remote ---
       "git stash list": "allow",
       "git branch": "allow",
+      "git tag": "allow",
       "git remote": "allow",
+      "git remote *": "allow",
+      "git show-ref": "allow",
+      "git show-ref *": "allow",
+      "git for-each-ref *": "allow",
+      "git reflog": "allow",
+      "git reflog show *": "allow",
+      // --- object / tree inspection ---
+      "git ls-files": "allow",
       "git ls-files *": "allow",
+      "git ls-tree *": "allow",
+      "git ls-remote": "allow",
+      "git ls-remote *": "allow",
+      "git cat-file *": "allow",
+      // --- rev / commit resolution ---
       "git rev-parse *": "allow",
-      "git blame *": "allow",
+      "git describe": "allow",
+      "git describe *": "allow",
+      "git name-rev *": "allow",
+      "git symbolic-ref *": "allow",
       "git merge-base *": "allow",
-
-      // ── Same read-only commands via git -C (used by tooling) ────
+      "git blame *": "allow",
+      // --- config read-only ---
+      "git config --get *": "allow",
+      "git config --get-all *": "allow",
+      "git config --list": "allow",
+      "git check-ignore *": "allow",
+      "git check-attr *": "allow",
+      // --- housekeeping / info ---
+      "git count-objects": "allow",
+      "git worktree list": "allow",
+      "git version": "allow",
+      "git fsck": "allow",
+      // --- -C variants (all of the above) ---
+      "git -C * status": "allow",
       "git -C * status *": "allow",
+      "git -C * diff": "allow",
       "git -C * diff *": "allow",
+      "git -C * diff-tree *": "allow",
+      "git -C * diff-index *": "allow",
+      "git -C * log": "allow",
       "git -C * log *": "allow",
+      "git -C * shortlog": "allow",
+      "git -C * shortlog *": "allow",
+      "git -C * show": "allow",
       "git -C * show *": "allow",
       "git -C * stash list": "allow",
       "git -C * branch": "allow",
+      "git -C * tag": "allow",
       "git -C * remote": "allow",
+      "git -C * remote *": "allow",
+      "git -C * show-ref": "allow",
+      "git -C * show-ref *": "allow",
+      "git -C * for-each-ref *": "allow",
+      "git -C * reflog": "allow",
+      "git -C * reflog show *": "allow",
+      "git -C * ls-files": "allow",
       "git -C * ls-files *": "allow",
+      "git -C * ls-tree *": "allow",
+      "git -C * ls-remote": "allow",
+      "git -C * ls-remote *": "allow",
+      "git -C * cat-file *": "allow",
       "git -C * rev-parse *": "allow",
-      "git -C * blame *": "allow",
+      "git -C * describe": "allow",
+      "git -C * describe *": "allow",
+      "git -C * name-rev *": "allow",
+      "git -C * symbolic-ref *": "allow",
       "git -C * merge-base *": "allow",
-
-      // ── Safe local write git (mutates local only, recoverable) ──
+      "git -C * blame *": "allow",
+      "git -C * config --get *": "allow",
+      "git -C * config --get-all *": "allow",
+      "git -C * config --list": "allow",
+      "git -C * check-ignore *": "allow",
+      "git -C * check-attr *": "allow",
+      "git -C * count-objects": "allow",
+      "git -C * worktree list": "allow",
+      "git -C * fsck": "allow",
       "git add *": "allow",
       "git commit *": "allow",
       "git stash *": "allow",
-      // ── Same write commands via git -C ──────────────────────────
       "git -C * add *": "allow",
       "git -C * commit *": "allow",
       "git -C * stash *": "allow",
@@ -146,10 +223,8 @@
       // ── Deny git add -A ───────────────────────────────────────── 
       "git add * -A *": "deny",
       "git add * --all *": "deny",
-      "git -C add * -A *": "deny",
-      "git -C add * --all *": "deny",
-
-      // ── Potentially destructive — always ask ────────────────────
+      "git -C * add * -A *": "deny",
+      "git -C * add * --all *": "deny",
       "git checkout *": "ask",
       "git branch *": "ask",
       "git reset *": "ask",
@@ -162,10 +237,38 @@
       "git -C * clean *": "ask",
       "git -C * rebase *": "ask",
       "git -C * push *": "ask",
-
-      // ── Catch-all for any other git command ─────────────────────
-      "git *": "ask"
+      "git *": "ask",
+      // --- gh read-only (api / graphql / view / list / search) ---
+      "gh api -X GET *": "allow",
+      "gh api --method GET *": "allow",
+      "gh pr list *": "allow",
+      "gh pr view *": "allow",
+      "gh pr status": "allow",
+      "gh pr status *": "allow",
+      "gh pr checks *": "allow",
+      "gh issue list *": "allow",
+      "gh issue view *": "allow",
+      "gh issue status": "allow",
+      "gh issue status *": "allow",
+      "gh repo view *": "allow",
+      "gh repo list *": "allow",
+      "gh run list *": "allow",
+      "gh run view *": "allow",
+      "gh workflow list *": "allow",
+      "gh workflow view *": "allow",
+      "gh release list *": "allow",
+      "gh release view *": "allow",
+      "gh search *": "allow",
+      "gh label list *": "allow",
+      "gh milestone list *": "allow",
+      "gh project list *": "allow",
+      "gh project view *": "allow",
+      "gh gist list *": "allow",
+      "gh gist view *": "allow",
+      "gh auth status": "allow",
+      "gh auth status *": "allow",
+      "gh status": "allow",
+      "gh *": "ask"
     }
   }
 }
-
