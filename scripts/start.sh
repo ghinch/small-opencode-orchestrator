@@ -85,8 +85,6 @@ for SERVICE in ${SERVICES}; do
         fi
       fi
       log "starting agent-vault..."
-      log "  password length: ${#AGENT_VAULT_MASTER_PASSWORD}"
-      log "  password hex: $(printf '%s' "${AGENT_VAULT_MASTER_PASSWORD}" | xxd | head -1)"
       container run -d \
         --name "${CONTAINER}" \
         --network "${NETWORK}" \
