@@ -1,25 +1,21 @@
 version: "3.8"
 name: opencode-sandbox
 
-# -- Apple Container / container-compose orchestration --
-# Replaces Docker Compose. Uses Apple Container (apple/container)
-# as the container runtime + container-compose for orchestration.
+# -- OpenCode + Agent Vault — container orchestration (Apple Container) --
+#
+# ⚠ container-compose was found to be buggy (env_file not loaded,
+#   naming mismatch, silent container failures). See scripts/start.sh
+#   and scripts/stop.sh which use `container run` directly.
+#
+# This file documents the intended architecture; it is NOT used at
+# runtime. To start:  source .env && ./scripts/start.sh
 #
 # Key differences from Docker Compose:
 #   - Images need docker.io/ prefix (e.g. docker.io/library/node:22-slim)
-#   - No restart policies (unsupported by container-compose)
-#   - No healthchecks (parsed but not wired)
-#   - No `container-compose run` — bootstrap is a manual `container run --rm`
 #   - No `${VAR:-default}` expansion — use env_file or hardcoded values
 #   - environment must be mapping format (KEY: value), not list (- KEY=value)
 #
-# Usage:
-#   cp .env.example .env  # then edit with real values
-#   container system start
-#   container-compose build
-#   container-compose up -d agent-vault
-#   # then run the bootstrap manually (see .env.example)
-#   container-compose up -d
+# Architecture:
 
 networks:
   internal:
