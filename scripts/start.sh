@@ -39,6 +39,8 @@ fi
 for var in AGENT_VAULT_MASTER_PASSWORD AGENT_VAULT_EMAIL AGENT_VAULT_PASSWORD OPENCODE_SERVER_PASSWORD AGENT_VAULT_VAULT; do
   if [ -n "${!var:-}" ]; then
     printf -v "$var" '%s' "${!var}"
+    # Also strip carriage returns (common when editing .env on Windows/macOS)
+    declare -g "$var=${!var//$'\r'/}"
   fi
 done
 
