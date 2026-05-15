@@ -35,14 +35,19 @@ else
   log "WARNING: ${ENV_FILE} not found — copy .env.example to .env and edit"
 fi
 
-# Strip stray whitespace/newlines from critical vars
-for var in AGENT_VAULT_MASTER_PASSWORD AGENT_VAULT_EMAIL AGENT_VAULT_PASSWORD OPENCODE_SERVER_PASSWORD AGENT_VAULT_VAULT; do
-  if [ -n "${!var:-}" ]; then
-    printf -v "$var" '%s' "${!var}"
-    # Also strip carriage returns (common when editing .env on Windows/macOS)
-    declare -g "$var=${!var//$'\r'/}"
-  fi
-done
+# Strip carriage returns from .env values (Windows line endings)
+# Also remove trailing whitespace
+AGENT_VAULT_MASTER_PASSWORD="${AGENT_VAULT_MASTER_PASSWORD//$'\r'/}"
+AGENT_VAULT_MASTER_PASSWORD="${AGENT_VAULT_MASTER_PASSWORD%"${AGENT_VAULT_MASTER_PASSWORD##*[![:space:]]}"}"
+AGENT_VAULT_EMAIL="${AGENT_VAULT_EMAIL//$'\r'/}"
+AGENT_VAULT_EMAIL="${AGENT_VAULT_EMAIL%"${AGENT_VAULT_EMAIL##*[![:space:]]}"}"
+AGENT_VAULT_PASSWORD="${AGENT_VAULT_PASSWORD//$'\r'/}"
+AGENT_VAULT_PASSWORD="${AGENT_VAULT_PASSWORD%"${AGENT_VAULT_PASSWORD##*[![:space:]]}"}"
+OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD//$'\r'/}"
+OPENCODE_SERVER_PASSWORD="${OPENCODE_SERVER_PASSWORD%"${OPENCODE_SERVER_PASSWORD##*[![:space:]]}"}"
+if [ -n "${AGENT_VAULT_VAULT:-}" ]; then
+  AGENT_VAULT_VAULT="${AGENT_VAULT_VAULT//$'\r'/}"
+fi
 
 # ── check prerequisites ──
 command -v container >/dev/null 2>&1 || die "container CLI not found — install Apple Container"
